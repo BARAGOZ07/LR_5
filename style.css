@@ -1,0 +1,25 @@
+body {
+    margin: 0;
+    background-color: #0f3c2f;
+    color: white;
+}
+
+.logo {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #0d3d2f;
+}
+
+main a {
+    color: #79c9a2;
+}
+
+    main a:hover {
+        color: lightseagreen;
+    }
+
+textarea {
+    resize: vertical;
+}
