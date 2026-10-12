@@ -1,73 +1,124 @@
-<!DOCTYPE html>
-<html lang="ru">
 
-<head>
-    <meta charset="UTF-8">
-    <title>Задание 5 — Калькулятор заказа</title>
-</head>
+<section class="calculator">
+    <h2>Калькулятор стоимости заказа</h2>
 
-<body>
+    <div id="products">
+        <div class="product-row">
+            <select class="product">
+                <option value="100">Ручка — 100 руб.</option>
+                <option value="250">Тетрадь — 250 руб.</option>
+                <option value="500">Книга — 500 руб.</option>
+            </select>
 
-    <h1>Калькулятор стоимости заказа</h1>
+            <input
+                type="number"
+                class="quantity"
+                min="1"
+                value="1"
+                placeholder="Количество"
+            >
 
-    <!-- Выбор товара -->
-    <label for="product">Выберите товар:</label>
+            <button type="button" class="remove-btn"
+                    onclick="removeProduct(this)">
+                Удалить
+            </button>
+        </div>
+    </div>
 
-    <select id="product">
-        <option value="100">Ручка — 100 руб.</option>
-        <option value="250">Тетрадь — 250 руб.</option>
-        <option value="500">Книга — 500 руб.</option>
-    </select>
+    <div class="calculator-buttons">
+        <button type="button" onclick="addProduct()">
+            + Добавить товар
+        </button>
 
-    <br><br>
+        <button type="button" onclick="calculateTotal()">
+            Рассчитать стоимость
+        </button>
+    </div>
 
-    <!-- Ввод количества -->
-    <label for="quantity">Количество товара:</label>
+    <div id="result"></div>
+</section>
 
-    <input
-        type="number"
-        id="quantity"
-        min="1"
-        value="1"
-    >
+function addProduct() {
+    const products = document.getElementById("products");
 
-    <br><br>
+    const row = document.createElement("div");
+    row.className = "product-row";
 
-    <!-- Кнопка расчёта -->
-    <button onclick="calculatePrice()">
-        Рассчитать стоимость
-    </button>
+    row.innerHTML = `
+        <select class="product">
+            <option value="100">Ручка — 100 руб.</option>
+            <option value="250">Тетрадь — 250 руб.</option>
+            <option value="500">Книга — 500 руб.</option>
+        </select>
 
-    <!-- Вывод результата -->
-    <p id="result"></p>
+        <input
+            type="number"
+            class="quantity"
+            min="1"
+            value="1"
+            placeholder="Количество"
+        >
 
-    <script>
-        function calculatePrice() {
+        <button type="button" class="remove-btn"
+                onclick="removeProduct(this)">
+            Удалить
+        </button>
+    `;
 
-            // Получаем цену выбранного товара
-            let product = document.getElementById("product");
-            let price = Number(product.value);
+    products.appendChild(row);
+}
 
-            // Получаем количество товара
-            let quantity = Number(
-                document.getElementById("quantity").value
+function removeProduct(button) {
+    const rows = document.querySelectorAll(".product-row");
+
+    if (rows.length === 1) {
+        document.getElementById("result").textContent =
+            "В заказе должна остаться хотя бы одна позиция.";
+        return;
+    }
+
+    button.closest(".product-row").remove();
+    document.getElementById("result").textContent = "";
+}
+
+function calculateTotal() {
+    const rows = document.querySelectorAll(".product-row");
+    const result = document.getElementById("result");
+
+    let total = 0;
+    let details = "";
+    let hasError = false;
+
+    rows.forEach(function(row) {
+        const product = row.querySelector(".product");
+        const quantityInput = row.querySelector(".quantity");
+
+        const price = Number(product.value);
+        const quantity = Number(quantityInput.value);
+
+        if (!Number.isInteger(quantity) || quantity < 1) {
+            hasError = true;
+            quantityInput.setCustomValidity(
+                "Введите целое количество не меньше 1."
             );
-
-            // Проверяем количество
-            if (!Number.isInteger(quantity) || quantity < 1) {
-                document.getElementById("result").textContent =
-                    "Введите целое количество товара, не меньше 1.";
-                return;
-            }
-
-            // Рассчитываем стоимость
-            let total = price * quantity;
-
-            // Выводим результат на страницу
-            document.getElementById("result").textContent =
-                "Стоимость заказа: " + total + " руб.";
+            quantityInput.reportValidity();
+            return;
         }
-    </script>
 
-</body>
-</html>
+        quantityInput.setCustomValidity("");
+
+        const cost = price * quantity;
+        total += cost;
+
+        details += `<p>${product.selectedOptions[0].text.split(" — ")[0]}:
+            ${quantity} шт. × ${price} руб. = ${cost} руб.</p>`;
+    });
+
+    if (hasError) {
+        result.textContent = "Проверьте количество товаров.";
+        return;
+    }
+
+    result.innerHTML = details +
+        `<p>Итого: ${total} руб.</p>`;
+}
