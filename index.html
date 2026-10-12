@@ -1,124 +1,469 @@
 
-<section class="calculator">
-    <h2>Калькулятор стоимости заказа</h2>
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Калькулятор стоимости заказа</title>
 
-    <div id="products">
-        <div class="product-row">
-            <select class="product">
-                <option value="100">Ручка — 100 руб.</option>
-                <option value="250">Тетрадь — 250 руб.</option>
-                <option value="500">Книга — 500 руб.</option>
-            </select>
+    <style>
+        /* ОСНОВНЫЕ СТИЛИ САЙТА */
 
-            <input
-                type="number"
-                class="quantity"
-                min="1"
-                value="1"
-                placeholder="Количество"
-            >
-
-            <button type="button" class="remove-btn"
-                    onclick="removeProduct(this)">
-                Удалить
-            </button>
-        </div>
-    </div>
-
-    <div class="calculator-buttons">
-        <button type="button" onclick="addProduct()">
-            + Добавить товар
-        </button>
-
-        <button type="button" onclick="calculateTotal()">
-            Рассчитать стоимость
-        </button>
-    </div>
-
-    <div id="result"></div>
-</section>
-
-function addProduct() {
-    const products = document.getElementById("products");
-
-    const row = document.createElement("div");
-    row.className = "product-row";
-
-    row.innerHTML = `
-        <select class="product">
-            <option value="100">Ручка — 100 руб.</option>
-            <option value="250">Тетрадь — 250 руб.</option>
-            <option value="500">Книга — 500 руб.</option>
-        </select>
-
-        <input
-            type="number"
-            class="quantity"
-            min="1"
-            value="1"
-            placeholder="Количество"
-        >
-
-        <button type="button" class="remove-btn"
-                onclick="removeProduct(this)">
-            Удалить
-        </button>
-    `;
-
-    products.appendChild(row);
-}
-
-function removeProduct(button) {
-    const rows = document.querySelectorAll(".product-row");
-
-    if (rows.length === 1) {
-        document.getElementById("result").textContent =
-            "В заказе должна остаться хотя бы одна позиция.";
-        return;
-    }
-
-    button.closest(".product-row").remove();
-    document.getElementById("result").textContent = "";
-}
-
-function calculateTotal() {
-    const rows = document.querySelectorAll(".product-row");
-    const result = document.getElementById("result");
-
-    let total = 0;
-    let details = "";
-    let hasError = false;
-
-    rows.forEach(function(row) {
-        const product = row.querySelector(".product");
-        const quantityInput = row.querySelector(".quantity");
-
-        const price = Number(product.value);
-        const quantity = Number(quantityInput.value);
-
-        if (!Number.isInteger(quantity) || quantity < 1) {
-            hasError = true;
-            quantityInput.setCustomValidity(
-                "Введите целое количество не меньше 1."
-            );
-            quantityInput.reportValidity();
-            return;
+        * {
+            box-sizing: border-box;
         }
 
-        quantityInput.setCustomValidity("");
+        body {
+            margin: 0;
+            background-color: #0f3c2f;
+            color: white;
+            font-family: Arial, sans-serif;
+        }
 
-        const cost = price * quantity;
-        total += cost;
+        a {
+            color: #79c9a2;
+        }
 
-        details += `<p>${product.selectedOptions[0].text.split(" — ")[0]}:
-            ${quantity} шт. × ${price} руб. = ${cost} руб.</p>`;
-    });
+        /* ШАПКА */
 
-    if (hasError) {
-        result.textContent = "Проверьте количество товаров.";
-        return;
-    }
+        #header {
+            width: 100%;
+            background-color: black;
+            padding: 15px;
+        }
 
-    result.innerHTML = details +
-        `<p>Итого: ${total} руб.</p>`;
-}
+        .header-content {
+            max-width: 960px;
+            margin: auto;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .logo img {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #0d3d2f;
+        }
+
+        .site-name {
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+        #menu {
+            display: flex;
+            gap: 15px;
+            margin-left: auto;
+            flex-wrap: wrap;
+        }
+
+        #menu a {
+            color: lightseagreen;
+            text-decoration: none;
+        }
+
+        #menu a:hover {
+            color: white;
+        }
+
+        /* ОСНОВНОЙ КОНТЕНТ */
+
+        .content {
+            max-width: 960px;
+            margin: auto;
+            padding: 20px;
+        }
+
+        h1 {
+            margin-top: 0;
+        }
+
+        /* КАЛЬКУЛЯТОР */
+
+        .calculator {
+            background-color: #0a3327;
+            border: 1px solid #79c9a2;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .calculator h2 {
+            margin-top: 0;
+            color: #79c9a2;
+        }
+
+        .description {
+            color: #d4e8de;
+            line-height: 1.5;
+        }
+
+        .product-row {
+            display: grid;
+            grid-template-columns: minmax(0, 2fr)
+                                   minmax(100px, 1fr)
+                                   auto;
+            gap: 10px;
+            margin-bottom: 15px;
+            align-items: center;
+        }
+
+        .product-row select,
+        .product-row input {
+            width: 100%;
+            min-width: 0;
+            padding: 11px;
+            background-color: #0f3c2f;
+            color: white;
+            border: 1px solid #79c9a2;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .product-row select option {
+            background-color: #0f3c2f;
+            color: white;
+        }
+
+        .calculator button {
+            padding: 11px 15px;
+            background-color: black;
+            color: #79c9a2;
+            border: 1px solid #79c9a2;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .calculator button:hover {
+            background-color: #164d3b;
+        }
+
+        .calculator .remove-btn {
+            color: #ffaaaa;
+            border-color: #c77b7b;
+        }
+
+        .calculator-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        /* РЕЗУЛЬТАТ */
+
+        #result {
+            margin-top: 25px;
+            padding-top: 15px;
+            border-top: 1px solid #315e4e;
+        }
+
+        #result h3 {
+            color: #79c9a2;
+        }
+
+        .result-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+            padding: 10px 0;
+            border-bottom: 1px solid #315e4e;
+        }
+
+        .total {
+            font-size: 22px;
+            font-weight: bold;
+            color: #79c9a2;
+            margin-top: 20px;
+        }
+
+        .error {
+            color: #ffaaaa;
+        }
+
+        /* ПОДВАЛ */
+
+        #footer {
+            width: 100%;
+            background-color: black;
+            padding: 20px;
+            color: white;
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        /* МОБИЛЬНАЯ ВЕРСИЯ */
+
+        @media (max-width: 600px) {
+            .header-content {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            #menu {
+                margin-left: 0;
+            }
+
+            .product-row {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .product-row select {
+                grid-column: 1 / -1;
+            }
+
+            .product-row .remove-btn {
+                grid-column: 1 / -1;
+            }
+
+            .calculator-buttons {
+                flex-direction: column;
+            }
+
+            .calculator-buttons button {
+                width: 100%;
+            }
+
+            .result-row {
+                flex-direction: column;
+                gap: 5px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ШАПКА САЙТА -->
+
+    <header id="header">
+        <div class="header-content">
+
+            <div class="logo">
+                <a href="index.html">
+                    <img
+                        src="doroga_razmetka_dal_167834_2560x1600.jpg"
+                        alt="Логотип сайта"
+                    >
+                </a>
+            </div>
+
+            <div class="site-name">
+                Мой сайт
+            </div>
+
+            <nav id="menu">
+                <a href="index.html">Главная</a>
+                <a href="calculator.html">Калькулятор</a>
+                <a href="#footer">Контакты</a>
+            </nav>
+
+        </div>
+    </header>
+
+    <!-- ОСНОВНОЙ КОНТЕНТ -->
+
+    <main class="content">
+
+        <h1>Калькулятор стоимости заказа</h1>
+
+        <p class="description">
+            Выберите товары, укажите необходимое количество
+            и нажмите кнопку расчёта стоимости заказа.
+        </p>
+
+        <section class="calculator">
+
+            <h2>Ваш заказ</h2>
+
+            <div id="products">
+
+                <!-- ПЕРВАЯ ПОЗИЦИЯ -->
+
+                <div class="product-row">
+
+                    <select class="product" aria-label="Выбор товара">
+                        <option value="100">Ручка — 100 руб.</option>
+                        <option value="250">Тетрадь — 250 руб.</option>
+                        <option value="500">Книга — 500 руб.</option>
+                        <option value="150">Карандаш — 150 руб.</option>
+                        <option value="800">Рюкзак — 800 руб.</option>
+                    </select>
+
+                    <input
+                        type="number"
+                        class="quantity"
+                        min="1"
+                        step="1"
+                        value="1"
+                        aria-label="Количество товара"
+                    >
+
+                    <button
+                        type="button"
+                        class="remove-btn"
+                        onclick="removeProduct(this)"
+                    >
+                        Удалить
+                    </button>
+
+                </div>
+
+            </div>
+
+            <div class="calculator-buttons">
+
+                <button type="button" onclick="addProduct()">
+                    + Добавить товар
+                </button>
+
+                <button type="button" onclick="calculateTotal()">
+                    Рассчитать стоимость
+                </button>
+
+            </div>
+
+            <div id="result" aria-live="polite"></div>
+
+        </section>
+
+    </main>
+
+    <!-- ПОДВАЛ -->
+
+    <footer id="footer">
+        <p>Мой сайт © 2026</p>
+    </footer>
+
+    <!-- JAVASCRIPT -->
+
+    <script>
+        // Добавление новой позиции в заказ
+
+        function addProduct() {
+            const products = document.getElementById("products");
+
+            const row = document.createElement("div");
+            row.className = "product-row";
+
+            row.innerHTML = `
+                <select class="product" aria-label="Выбор товара">
+                    <option value="100">Ручка — 100 руб.</option>
+                    <option value="250">Тетрадь — 250 руб.</option>
+                    <option value="500">Книга — 500 руб.</option>
+                    <option value="150">Карандаш — 150 руб.</option>
+                    <option value="800">Рюкзак — 800 руб.</option>
+                </select>
+
+                <input
+                    type="number"
+                    class="quantity"
+                    min="1"
+                    step="1"
+                    value="1"
+                    aria-label="Количество товара"
+                >
+
+                <button
+                    type="button"
+                    class="remove-btn"
+                    onclick="removeProduct(this)"
+                >
+                    Удалить
+                </button>
+            `;
+
+            products.appendChild(row);
+
+            document.getElementById("result").innerHTML = "";
+        }
+
+        // Удаление позиции из заказа
+
+        function removeProduct(button) {
+            const rows = document.querySelectorAll(".product-row");
+
+            if (rows.length === 1) {
+                document.getElementById("result").innerHTML =
+                    '<p class="error">В заказе должна остаться хотя бы одна позиция.</p>';
+                return;
+            }
+
+            button.closest(".product-row").remove();
+
+            document.getElementById("result").innerHTML = "";
+        }
+
+        // Расчёт общей стоимости заказа
+
+        function calculateTotal() {
+            const rows = document.querySelectorAll(".product-row");
+            const result = document.getElementById("result");
+
+            let total = 0;
+            let details = "";
+            let hasError = false;
+
+            rows.forEach(function(row) {
+                const product = row.querySelector(".product");
+                const quantityInput = row.querySelector(".quantity");
+
+                const price = Number(product.value);
+                const quantity = Number(quantityInput.value);
+
+                quantityInput.setCustomValidity("");
+
+                if (
+                    quantityInput.value.trim() === "" ||
+                    !Number.isInteger(quantity) ||
+                    quantity < 1
+                ) {
+                    quantityInput.setCustomValidity(
+                        "Введите целое количество, не меньше 1."
+                    );
+
+                    quantityInput.reportValidity();
+
+                    hasError = true;
+                    return;
+                }
+
+                const cost = price * quantity;
+
+                total += cost;
+
+                const productName =
+                    product.options[product.selectedIndex].text
+                        .split(" — ")[0];
+
+                details += `
+                    <div class="result-row">
+                        <span>
+                            ${productName}: ${quantity} шт. × ${price} руб.
+                        </span>
+                        <strong>${cost} руб.</strong>
+                    </div>
+                `;
+            });
+
+            if (hasError) {
+                result.innerHTML =
+                    '<p class="error">Проверьте количество товаров.</p>';
+                return;
+            }
+
+            result.innerHTML = `
+                <h3>Состав заказа</h3>
+                ${details}
+                <p class="total">Итого: ${total} руб.</p>
+            `;
+        }
+    </script>
+
+</body>
+</html>
