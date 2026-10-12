@@ -1,25 +1,103 @@
-body {
-    margin: 0;
-    background-color: #0f3c2f;
+
+/* КАЛЬКУЛЯТОР */
+
+.calculator {
+    background-color: #0a3327;
+    border: 1px solid #79c9a2;
+    border-radius: 8px;
+    padding: 20px;
+    margin-top: 25px;
     color: white;
 }
 
-.logo {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 2px solid #0d3d2f;
-}
-
-main a {
+.calculator h2 {
+    margin-top: 0;
     color: #79c9a2;
 }
 
-    main a:hover {
-        color: lightseagreen;
+.product-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.product-row select,
+.product-row input {
+    padding: 10px;
+    border: 1px solid #79c9a2;
+    border-radius: 4px;
+    background-color: #0f3c2f;
+    color: white;
+    font-size: 14px;
+}
+
+.product-row select {
+    flex: 2;
+    min-width: 0;
+}
+
+.product-row input {
+    flex: 1;
+    width: 100%;
+    min-width: 0;
+}
+
+.calculator button {
+    padding: 10px 15px;
+    border: 1px solid #79c9a2;
+    border-radius: 4px;
+    background-color: black;
+    color: #79c9a2;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.calculator button:hover {
+    background-color: #164d3b;
+}
+
+.calculator-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.calculator .remove-btn {
+    border-color: #c77b7b;
+    color: #ffaaaa;
+}
+
+#result {
+    margin-top: 20px;
+    font-size: 18px;
+    font-weight: bold;
+    color: #79c9a2;
+}
+
+#result p {
+    margin: 8px 0;
+}
+
+@media (max-width: 600px) {
+    .product-row {
+        flex-wrap: wrap;
     }
 
-textarea {
-    resize: vertical;
+    .product-row select {
+        flex-basis: 100%;
+    }
+
+    .product-row input {
+        flex: 1;
+    }
+
+    .calculator-buttons {
+        flex-direction: column;
+    }
+
+    .calculator-buttons button {
+        width: 100%;
+    }
 }
